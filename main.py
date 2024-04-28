@@ -83,7 +83,7 @@ def ent_pass(message):
 def ent_do(message):
     ans = message.text.strip()
     if ans == str(2):
-        bot.send_message(message.chat.id, 'Видите имя пароля')
+        bot.send_message(message.chat.id, 'Введите имя пароля')
         bot.register_next_step_handler(message, snop)
     elif ans == str(1):
         eng = create_engine("sqlite:///Profiles.sql")
