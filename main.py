@@ -13,22 +13,17 @@ bot = telebot.TeleBot('6914013926:AAG4oYUHrZi8_KU4WrjopPNq5LqUJf8SxoY')
 
 @bot.message_handler(commands=['start'])
 def start(message):
-    eng = create_engine("sqlite:///Profiles.sql", execution_options={'autocommit': True})
+    eng = create_engine("sqlite:///Profiles.sql")
     conn = eng.connect()
 
     conn.execute(text("""CREATE TABLE IF NOT EXISTS users (id int auto_increment primary key,
                    name varchar(50), passw varchar(50), nameofpass varchar(50), loginofpass varchar(50),
                    passofpass varchar(50))"""))
-
+    conn.commit()
     conn.close()
     bot.reply_to(message, f'Привет, {message.from_user.first_name} {message.from_user.last_name} '
                           f'вы хотите зарегистрироваться или войти в аккаунт? (Войти/Зарегистрироваться)')
     bot.register_next_step_handler(message, check_ans)
-
-    # Потом пригодится
-    
-    # while True:
-        # bot.reply_to(message, "Пошёл нахуй быдло")
 
 
 def check_ans(message):
@@ -47,7 +42,7 @@ def entname(message):
     name = message.text.strip()
     if name == '0':
         bot.reply_to(message, f'Привет, {message.from_user.first_name} {message.from_user.last_name} '
-                              f'вы хотите зарегестрироваться или войти в аккаунт? (Войти/Зарегестрироваться)')
+                              f'вы хотите зарегистрироваться или войти в аккаунт? (Войти/Зарегистрироваться)')
         bot.register_next_step_handler(message, check_ans)
     else:
         bot.send_message(message.chat.id, 'Введите пароль.')
@@ -64,7 +59,7 @@ def regname(message):
 def ent_pass(message):
     global password
     password = message.text.strip()
-    eng = create_engine("sqlite:///Profiles.sql", execution_options={'autocommit': True})
+    eng = create_engine("sqlite:///Profiles.sql")
     conn = eng.connect()
     users = conn.execute(text('SELECT * FROM users')).fetchall()
     k = 0
@@ -91,7 +86,7 @@ def ent_do(message):
         bot.send_message(message.chat.id, 'Видите имя пароля')
         bot.register_next_step_handler(message, snop)
     elif ans == str(1):
-        eng = create_engine("sqlite:///Profiles.sql", execution_options={'autocommit': True})
+        eng = create_engine("sqlite:///Profiles.sql")
         conn = eng.connect()
         users = conn.execute(text('SELECT * FROM users')).fetchall()
 
@@ -130,13 +125,13 @@ def logsp(message):
 def savepass(message):
     global pass_of_pass
     pass_of_pass = message.text.strip()
-    eng = create_engine("sqlite:///Profiles.sql", execution_options={'autocommit': True})
+    eng = create_engine("sqlite:///Profiles.sql")
     conn = eng.connect()
     conn.execute(text(
         f"""INSERT INTO users (name, passw, nameofpass, loginofpass, passofpass)
             VALUES ('{name}', '{password}', '{name_of_pass}', '{log_of_name}', '{pass_of_pass}')"""
     ))
-
+    conn.commit()
     conn.close()
     bot.send_message(message.chat.id, 'Всё сохранилось')
     sp = list()
@@ -150,7 +145,7 @@ def savepass(message):
 def reg_pass(message):
     global password
     password = message.text.strip()
-    eng = create_engine("sqlite:///Profiles.sql", execution_options={'autocommit': True})
+    eng = create_engine("sqlite:///Profiles.sql")
     conn = eng.connect()
     users = conn.execute(text('SELECT * FROM users')).fetchall()
 
@@ -163,9 +158,10 @@ def reg_pass(message):
             INSERT INTO users (name, passw, nameofpass, loginofpass, passofpass)
             VALUES ('{name}', '{password}', 1, 1, 1)
         """))
+        conn.commit()
         conn.close()
 
-        bot.send_message(message.chat.id, 'Пользователь зарегестрирован! Что вы хотите сделать дальше?')
+        bot.send_message(message.chat.id, 'Пользователь зарегиистрирован! Что вы хотите сделать дальше?')
         sp = list()
         sp.append("-Увидеть ваши сохраненные пароли (напишите ,,1'')")
         sp.append("-Сохранить Пароль (напишите ,,2'')")
